@@ -58,3 +58,19 @@ class TestRecipeApi(TestCase):
         serializer = RecipeSerializer(recipe_with_ingredients)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(serializer.data, res.data)
+
+    def test_list_recipes_with_filter(self):
+        recipe1 = create_sample_recipe(
+            name='Big Mac'
+        )
+
+        create_sample_recipe(name='Whopper')
+
+        res = self.client.get(RECIPES_URL, {'name': 'Big'})
+
+        serializer = RecipeSerializer(recipe1)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+        self.assertEqual(serializer.data, res.data[0])
+

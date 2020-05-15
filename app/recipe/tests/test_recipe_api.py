@@ -9,6 +9,10 @@ from recipe.serializers import RecipeSerializer
 RECIPES_URL = reverse('recipe:recipe-list')
 
 
+def get_recipe_detail_url(recipe_id):
+    return reverse('recipe:recipe-detail', args=[recipe_id])
+
+
 def create_sample_recipe(name='Krusty krab burguer', description='Best in bikini botton'):
     return Recipe.objects.create(
         name=name,
@@ -41,3 +45,16 @@ class TestRecipeApi(TestCase):
         serializer = RecipeSerializer(recipes, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    def test_view_recipe_detail(self):
+        recipe_with_ingredients = create_sample_recipe()
+        recipe_with_ingredients.ingredients.add(
+            create_sample_ingredient(recipe_with_ingredients)
+        )
+
+        url = get_recipe_detail_url(recipe_with_ingredients.id)
+        res = self.client.get(url)
+
+        serializer = RecipeSerializer(recipe_with_ingredients)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(serializer.data, res.data)

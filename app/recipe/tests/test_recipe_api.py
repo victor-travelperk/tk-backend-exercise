@@ -133,3 +133,13 @@ class TestRecipeApi(TestCase):
         self.assertEqual(len(ingredients), 2)
         self.assertEqual(payload_ingredients[0]['name'], ingredients[0].name)
         self.assertEqual(payload_ingredients[1]['name'], ingredients[1].name)
+
+    def test_delete_recipe(self):
+        recipe = create_sample_recipe()
+        create_sample_ingredient(recipe)
+        create_sample_ingredient(recipe)
+
+        url = get_recipe_detail_url(recipe.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)

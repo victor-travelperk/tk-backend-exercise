@@ -29,3 +29,17 @@ class RecipeSerializer(serializers.ModelSerializer):
                 Ingredient.objects.create(recipe=recipe, **ingredient)
 
         return recipe
+
+    def update(self, instance, validated_data):
+        """Update attributes for Recipe and remove old ingredients"""
+        new_ingredients = validated_data.pop('ingredients', None)
+        old_ingredients = Ingredient.objects.all().filter(recipe=instance)
+        old_ingredients.delete()
+        instance.name = validated_data['name']
+        instance.description = validated_data['description']
+        instance.save()
+
+        for ingredient in new_ingredients:
+            Ingredient.objects.create(recipe=instance, **ingredient)
+
+        return instance

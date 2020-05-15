@@ -100,3 +100,36 @@ class TestRecipeApi(TestCase):
         res = self.client.post(RECIPES_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_recipe_successful(self):
+        recipe = create_sample_recipe(
+            name='Burrito light',
+            description='Burrito for a quick bite'
+        )
+        create_sample_ingredient(recipe, name='Wrap')
+        create_sample_ingredient(recipe, name='Cochinillo')
+
+        payload = {
+            'name': 'Ultra burrito',
+            'description': 'Best way to welcome your cheat day',
+            'ingredients': [
+                {'name': 'Extra thick flour tortilla'},
+                {'name': 'Salsa la vista'}
+            ]
+        }
+
+        url = get_recipe_detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        recipe.refresh_from_db()
+
+        self.assertEqual(payload['name'], recipe.name)
+        self.assertEqual(payload['description'], recipe.description)
+
+        # Validate that the only new ingredients are present
+        ingredients = recipe.ingredients.all().order_by('name')
+        payload_ingredients = sorted(payload['ingredients'], key=lambda x: x['name'])
+        self.assertEqual(len(ingredients), 2)
+        self.assertEqual(payload_ingredients[0]['name'], ingredients[0].name)
+        self.assertEqual(payload_ingredients[1]['name'], ingredients[1].name)

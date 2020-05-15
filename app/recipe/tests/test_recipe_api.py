@@ -74,3 +74,29 @@ class TestRecipeApi(TestCase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(serializer.data, res.data[0])
 
+    def test_create_recipe_successful(self):
+        payload = {
+            'name': 'Mysterious Chicken nuggets',
+            'description': 'N',
+            'ingredients': [
+                {'name': 'Natural additives'},
+                {'name': 'Maybe soylent green'},
+            ]
+        }
+
+        res = self.client.post(RECIPES_URL, payload, format='json')
+
+        new_recipe = Recipe.objects.all().filter(name=payload['name'])[0]
+        new_recipe_serialized = RecipeSerializer(new_recipe)
+        self.assertEqual(
+            len(new_recipe_serialized.data['ingredients']),
+            2
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_create_recipe_invalid(self):
+        payload = {'name': ''}
+
+        res = self.client.post(RECIPES_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

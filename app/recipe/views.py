@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import Recipe
-from recipe.serializers import RecipeSerializer
+from recipe.serializers import RecipeSerializer, RecipeListAllSerializer
 
 
 class RecipeViewSet(ModelViewSet):
@@ -14,3 +14,8 @@ class RecipeViewSet(ModelViewSet):
         if name_filter:
             queryset = queryset.filter(name__contains=name_filter)
         return queryset.order_by("-id")
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return RecipeListAllSerializer
+        return RecipeSerializer

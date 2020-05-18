@@ -9,12 +9,21 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = ("name",)
 
 
-class RecipeSerializer(serializers.ModelSerializer):
+class RecipeListAllSerializer(serializers.ModelSerializer):
     ingredients = IngredientSerializer(many=True, required=True)
 
     class Meta:
         model = Recipe
         fields = ("name", "description", "ingredients")
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    ingredients = IngredientSerializer(many=True, required=True)
+
+    class Meta:
+        model = Recipe
+        fields = ("id", "name", "description", "ingredients")
+        read_only_fields = ("id",)
 
     def create(self, validated_data):
         ingredients = validated_data.pop("ingredients", None)

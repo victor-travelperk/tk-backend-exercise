@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 
 from core.models import Recipe, Ingredient
-from recipe.serializers import RecipeSerializer, RecipeListAllSerializer
+from recipe.serializers import RecipeSerializer
 
 RECIPES_URL = reverse("recipe:recipe-list")
 
@@ -37,7 +37,7 @@ class TestRecipeApi(TestCase):
         res = self.client.get(RECIPES_URL)
 
         recipes = Recipe.objects.all().order_by("-id")
-        serializer = RecipeListAllSerializer(recipes, many=True)
+        serializer = RecipeSerializer(recipes, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
@@ -61,7 +61,7 @@ class TestRecipeApi(TestCase):
 
         res = self.client.get(RECIPES_URL, {"name": "Big"})
 
-        serializer = RecipeListAllSerializer(recipe1)
+        serializer = RecipeSerializer(recipe1)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
